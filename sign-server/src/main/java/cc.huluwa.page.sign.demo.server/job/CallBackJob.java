@@ -17,6 +17,10 @@ public class CallBackJob extends QuartzJobBean implements Job {
 
     private String pcSignDTO;
 
+    /**
+     * quartz调度任务执行的方法
+     * @param jobExecutionContext
+     */
     protected void executeInternal(JobExecutionContext jobExecutionContext) {
 
         PcSignDTO pcSignDTO = JSON.parseObject(this.pcSignDTO,PcSignDTO.class);

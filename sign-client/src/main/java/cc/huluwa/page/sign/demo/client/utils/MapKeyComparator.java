@@ -2,6 +2,9 @@ package cc.huluwa.page.sign.demo.client.utils;
 
 import java.util.Comparator;
 
+/**
+ * Md5Map排序规则
+ */
 public class MapKeyComparator implements Comparator<String> {
 
     public int compare(String str1, String str2) {

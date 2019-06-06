@@ -28,12 +28,21 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class SignController {
 
+    /**
+     * 请求客户端地址
+     */
     @Value("${sign.requestUrl}")
     private String requestUrl;
 
+    /**
+     * 回调地址
+     */
     @Value("${sign.callBack}")
     private String callBackUrl;
 
+    /**
+     * 回调页面
+     */
     @Value("${sign.callPage}")
     private String callPage;
 
@@ -41,6 +50,10 @@ public class SignController {
     private RedisTools redisTools;
 
 
+    /**
+     * 跳转到签署点击跳转页面
+     * @return
+     */
     @RequestMapping(value = "/")
     public String signUI() {
         return "index";
@@ -117,6 +130,11 @@ public class SignController {
         return "successUI";
     }
 
+    /**
+     * 文件转base64
+     * @param filePath
+     * @return
+     */
     public String encryptToBase64(String filePath) {
         if (filePath == null) {
             return null;

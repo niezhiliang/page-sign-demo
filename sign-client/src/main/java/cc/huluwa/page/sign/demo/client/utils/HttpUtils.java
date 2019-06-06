@@ -14,7 +14,7 @@ public class HttpUtils {
 
     //post请求参数为json格式
     public static String doPost(String url, Object json) {
-        String returnValue = "这是默认返回值，接口调用失败";
+        String returnValue = null;
         CloseableHttpClient httpClient = HttpClients.createDefault();
         ResponseHandler<String> responseHandler = new BasicResponseHandler();
         try{

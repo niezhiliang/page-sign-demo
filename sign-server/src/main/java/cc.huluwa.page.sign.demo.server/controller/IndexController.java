@@ -29,10 +29,16 @@ public class IndexController {
     @Autowired
     private HttpServletRequest request;
 
+    /**
+     * 返回给客户端的签署form表单前缀
+     */
     private final static String FORM_BRFORE = "<html>" +
                                "<head></head>" +
                                "<body>";
 
+    /**
+     * 返回给客户端签署的from扁担后缀
+     */
     private final static String FORM_END =
                                "</form>" +
                                "<script>document.forms[0].submit();</script>" +
@@ -62,7 +68,7 @@ public class IndexController {
     public String pcSign(@RequestBody PcSignDTO pcSignDTO) {
 
         /**
-         * 返回给客户端form表单的前面一部分
+         * 拼接签署form表单
          */
         String form = "<form  method='post' action='http://127.0.0.1:8080/signUI'>";
 
@@ -104,6 +110,7 @@ public class IndexController {
 
     /**
      * 页面调用签署的方法
+     * 由于公司原因，所以我把签署的代码去掉了，并没有真正的去签署
      * @param contractId
      * @return
      */
@@ -113,8 +120,6 @@ public class IndexController {
 
         String signParams = redisTools.get(contractId);
         PcSignDTO pcSignDTO = JSON.parseObject(signParams,PcSignDTO.class);
-
-
 
         SuccessVO successVO = new SuccessVO();
         successVO.setFile(pcSignDTO.getFileBase64());

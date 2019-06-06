@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.Random;
 
 @Component
 @Slf4j
@@ -25,6 +24,15 @@ public class JobInvoke {
     @Autowired
     private QuartzService quartzService;
 
+
+    /**
+     * 调度任务执行方法的具体实现，
+     * 原理：第一次任务执行完成后，判断时候已经收到SUCCESS，
+     * 如果没有，则从redis中取出第二个执行时间，并将任务添加到
+     * quartz，如果收到了SUCCESS，则将redis中剩余的执行时间删除
+     * @param pcSignDTO
+     * @param successVO
+     */
     public void invokeJon(PcSignDTO pcSignDTO, SuccessVO successVO) {
 
         boolean flag = false;
