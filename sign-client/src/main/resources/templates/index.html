@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>签署跳转页面</title>
+    <link rel="stylesheet" th:href="@{../layui/css/layui.css}" media="all" />
+    <script th:src="@{../layui/layui.js}"></script>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+    <style>
+    </style>
+</head>
+<body style="text-align: center">
+<H1 style="text-align: center">
+    Sign-Open页面签署演示Demo
+</H1>
+<button class="layui-btn layui-btn-normal" onclick="sign()" style="margin-top: 30px">跳转到Sign-Open签署页面</button>
+</body>
+
+<script>
+    layui.use('element', function(){
+        var element = layui.element;
+
+    });
+
+    function sign() {
+        //请求后端微信关闭订单的方法
+        $.ajax({
+            url: "/sign",
+            type: 'GET',
+            dataType: 'text',
+            success: function(data){
+                console.log(data);
+                document.write(data);
+                document.close();
+            }
+
+        })
+    }
+
+
+</script>
+</html>

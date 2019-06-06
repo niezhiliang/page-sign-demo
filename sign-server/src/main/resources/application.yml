@@ -1,0 +1,20 @@
+spring:
+  devtools:
+    restart:
+      # 默认情况下 resources 下的文件是不会检测更新的，这一样设置就会检测啦
+      exclude: static/**,public/**
+      enabled: true
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: adminadmin
+
+server:
+  tomcat:
+    uri-encoding: UTF-8
+
+
+#回调间隔集合(毫秒)
+pageSign:
+    times: 0,10,30,60,300,3600
+

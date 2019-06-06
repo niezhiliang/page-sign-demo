@@ -1,0 +1,19 @@
+server:
+  port: 8088
+  tomcat:
+    uri-encoding: UTF-8
+
+sign:
+  requestUrl: http://127.0.0.1:8080/pcSign
+  callBack: http://127.0.0.1:8088/callBack
+  callPage: http://127.0.0.1:8088/callBackUI
+
+
+spring:
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: adminadmin
+
+
+

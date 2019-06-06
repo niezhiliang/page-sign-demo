@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>签署成功页面</title>
+    <link rel="stylesheet" th:href="@{../layui/css/layui.css}" media="all" />
+    <script th:src="@{../layui/layui.js}"></script>
+    <script th:src="@{../jquery.min.js}"></script>
+    <script  th:src="@{../pdf.js}"></script>
+    <script th:src="@{../pdf.work.js}"></script>
+
+    <style>
+    </style>
+</head>
+<body style="text-align: center">
+<div class="app">
+    <h1 style="color: red">签署成功，回调页面</h1>
+    <input id="contractFile" hidden th:value=" ${pdf}"/>
+    <div id="imgs"></div>
+</div>
+</body>
+
+<script>
+    layui.use('element', function(){
+        var element = layui.element;
+
+    });
+
+    $(function(){
+        //字体文件
+        PDFJS.cMapUrl= 'https://cdn.jsdelivr.net/npm/pdfjs/dist@2.0.288/cmaps/';
+        PDFJS.workerSrc = 'pdf.worker.js';
+        //获取合同base64
+        var pdfData = atob($("#contractFile").val());
+        var loadingTask = PDFJS.getDocument({data: pdfData});
+        loadingTask.promise.then(function(pdf) {
+            console.log('PDF loaded');
+
+            //获取pdf总页数
+            console.log(pdf.numPages)
+
+            for(var i = 1; i <=pdf.numPages; i++ ) {
+
+                var id = "canvas"+i;
+                var html = "<div><canvas id='"+id+"' style='width:785px;'></canvas></div>"
+                $("#imgs").append(html);
+
+                var canvas = document.getElementById(id);
+                var context = canvas.getContext('2d');
+                show(i,canvas,context)
+            }
+            // 渲染图片的方法
+            function show(i,canvas,context) {
+                pdf.getPage(i).then(function(page) {
+                    var CSS_UNITS = 96.0/ 72.0;
+                    var scale = 1.5;
+                    var viewport = page.getViewport(scale);
+
+                    canvas.height = Math.floor(viewport.height * CSS_UNITS);
+                    canvas.width = Math.floor(viewport.width * CSS_UNITS);
+
+                    var renderContext = {
+                        transform: [CSS_UNITS, 0, 0, CSS_UNITS, 0, 0],
+                        canvasContext: context,
+                        viewport: viewport
+                    };
+                    page.render(renderContext);
+                });
+            }
+
+        });
+    })
+
+</script>
+</html>

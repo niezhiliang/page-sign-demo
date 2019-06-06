@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>服务端签署页面</title>
+    <link rel="stylesheet" th:href="@{../layui/css/layui.css}" media="all" />
+    <script th:src="@{../layui/layui.js}"></script>
+    <script th:src="@{../jquery.min.js}"></script>
+    <script  th:src="@{../pdf.js}"></script>
+    <script th:src="@{../pdf.worker.js}"></script>
+
+    <style>
+        .app {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: auto;
+        }
+        .sign {
+            position: relative;
+            padding-left: 500px;
+            padding-right: 500px;
+            width: auto;
+            height: 100%;
+            background: #f5f5f5;
+        }
+
+        .sign sign-right {
+            top: 0;
+            background:#fff;
+        }
+        .sign .sign-central {
+            width: 100%;
+            height: 100%;
+            overflow-y: scroll;
+            position: relative;
+            margin-left: 1px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+    <input hidden id="contractId" th:value="${params.contractId}"/>
+    <input  id="contractFile"  hidden th:value="${params.fileBase64}"/>
+    <div class="sign">
+        <div class="sign-right">
+            <img th:src="'data:image/png;base64,' + ${params.signImgBase64}">
+            <button id="signbtn" class="layui-btn layui-btn-normal" onclick="doSign()">立即签署</button>
+        </div>
+        <div id="imgs" class="sign-central">
+
+        </div>
+    </div>
+
+
+
+</div>
+</body>
+
+<script>
+    layui.use('element', function(){
+        var element = layui.element;
+
+    });
+
+    $(function(){
+        //字体文件
+        PDFJS.cMapUrl= 'https://cdn.jsdelivr.net/npm/pdfjs/dist@2.0.288/cmaps/';
+        PDFJS.workerSrc = 'pdf.worker.js';
+        //获取合同base64
+        var pdfData = atob($("#contractFile").val());
+        var loadingTask = PDFJS.getDocument({data: pdfData});
+        loadingTask.promise.then(function(pdf) {
+            console.log('PDF loaded');
+
+            //获取pdf总页数
+            console.log(pdf.numPages)
+
+            for(var i = 1; i <=pdf.numPages; i++ ) {
+
+                var id = "canvas"+i;
+                var html = "<div><canvas id='"+id+"' style='width:785px;'></canvas></div>"
+                $("#imgs").append(html);
+
+                var canvas = document.getElementById(id);
+                var context = canvas.getContext('2d');
+                show(i,canvas,context)
+            }
+            // 渲染图片的方法
+            function show(i,canvas,context) {
+                pdf.getPage(i).then(function(page) {
+                    var CSS_UNITS = 96.0/ 72.0;
+                    var scale = 1.5;
+                    var viewport = page.getViewport(scale);
+
+                    canvas.height = Math.floor(viewport.height * CSS_UNITS);
+                    canvas.width = Math.floor(viewport.width * CSS_UNITS);
+
+                    var renderContext = {
+                        transform: [CSS_UNITS, 0, 0, CSS_UNITS, 0, 0],
+                        canvasContext: context,
+                        viewport: viewport
+                    };
+                    page.render(renderContext);
+                });
+            }
+
+        });
+    })
+    function doSign() {
+        $("#signbtn").attr("disabled", true);
+        $("#signbtn").text("正在签署中，别重复点击签署按钮,有点慢。。。")
+        var contractId = $("#contractId").val();
+        //请求后端微信关闭订单的方法
+        $.ajax({
+            url: "/sign?contractId="+contractId,
+            type: 'GET',
+            dataType: 'text',
+            success: function(data){
+                console.log(data);
+
+                window.location.href=data;
+            }
+
+        })
+    }
+</script>
+</html>
