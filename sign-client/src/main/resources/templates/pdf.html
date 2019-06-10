@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+
+<head>
+    <meta charset="UTF-8">
+    <script src="/Users/suyu/Library/WorkSpace/page-sign-demo/sign-client/src/main/resources/static/jquery.min.js"></script>
+    <script type="text/javascript" src="/Users/suyu/Library/WorkSpace/page-sign-demo/sign-client/src/main/resources/static/pdf.js"></script>
+</head>
+<body>
+<div id="container">
+    <!-- 正文 -->
+    <div class="container main">
+        <div class="body" style="width:788px;margin:auto;">
+            <div id="canvs"  style="margin:0px auto">
+                <canvas id="the-canvas" ></canvas>
+                <div style="text-align: center">
+                    <button id="prev" onclick="onPrevPage()">上一页</button>
+                    <span> <span id="page_num"></span> / <span id="page_count"></span></span>
+                    <button id="next" onclick="onNextPage()">下一页</button>
+                    &nbsp; &nbsp;
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(".ewb-details-bd").css("width","400px");
+    $("#the-canvas").css("width","400px");
+    var url = 'https://fxq-open.oss-cn-qingdao.aliyuncs.com/test.pdf';
+    PDFJS.workerSrc = '/Users/suyu/Library/WorkSpace/page-sign-demo/sign-client/src/main/resources/static/pdf.worker.js';
+    var pdfDoc = null,
+        pageNum = 1,//页码
+        pageRendering = false,//据我观察，是用来应对一时间多次点击下一页按钮的情况的,你可以试试。
+        pageNumPending = null,//取得最新的页码
+        scale = 2.5,//缩放倍数
+        canvas = document.getElementById('the-canvas'),
+        ctx = canvas.getContext('2d');
+    PDFJS.getDocument(url).then(function(pdfDoc_) {
+        pdfDoc = pdfDoc_;
+        document.getElementById('page_count').textContent = pdfDoc.numPages;
+        renderPage(pageNum);
+    });
+    /**
+     *以下方法可以放到js里面去
+     */
+    /**
+     *渲染当前页
+     */
+    function renderPage(num) {
+        pageRendering = true;
+
+        pdfDoc.getPage(num).then(function(page) {
+            var viewport = page.getViewport(scale);
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            var renderContext = {
+                canvasContext: ctx,
+                viewport: viewport
+            };
+            var renderTask = page.render(renderContext);
+
+            renderTask.promise.then(function() {
+                pageRendering = false;
+                if (pageNumPending !== null) {
+                    renderPage(pageNumPending);
+                    pageNumPending = null;
+                }
+            });
+        });
+
+        document.getElementById('page_num').textContent = num;
+    }
+
+    function queueRenderPage(num) {
+        if (pageRendering) {
+            pageNumPending = num;
+        } else {
+            renderPage(num);
+        }
+    }
+
+    /**
+     *上一页
+     */
+    function onPrevPage() {
+        if (pageNum <= 1) {
+            return;
+        }
+        pageNum--;
+        queueRenderPage(pageNum);
+    }
+
+    /**
+     *下一页
+     */
+    function onNextPage() {
+        if (pageNum >= pdfDoc.numPages) {
+            return;
+        }
+        pageNum++;
+        queueRenderPage(pageNum);
+    }
+
+</script>
+</body>
+
+</html>

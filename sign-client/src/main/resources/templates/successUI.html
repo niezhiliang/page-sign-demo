@@ -42,7 +42,7 @@
             for(var i = 1; i <=pdf.numPages; i++ ) {
 
                 var id = "canvas"+i;
-                var html = "<div><canvas id='"+id+"' style='width:785px;'></canvas></div>"
+                var html = "<div><canvas id='"+id+"'></canvas></div>"
                 $("#imgs").append(html);
 
                 var canvas = document.getElementById(id);
@@ -52,15 +52,16 @@
             // 渲染图片的方法
             function show(i,canvas,context) {
                 pdf.getPage(i).then(function(page) {
-                    var CSS_UNITS = 96.0/ 72.0;
-                    var scale = 1.5;
+                    //var CSS_UNITS = 96.0/ 72.0;
+                    var ratio = getPixelRatio(context);
+                    var scale = ratio;
                     var viewport = page.getViewport(scale);
 
-                    canvas.height = Math.floor(viewport.height * CSS_UNITS);
-                    canvas.width = Math.floor(viewport.width * CSS_UNITS);
+                    canvas.height = Math.floor(viewport.height) ;
+                    canvas.width = Math.floor(viewport.width );
 
                     var renderContext = {
-                        transform: [CSS_UNITS, 0, 0, CSS_UNITS, 0, 0],
+                        //transform: [ratio, 0, 0, ratio, 0, 0],
                         canvasContext: context,
                         viewport: viewport
                     };
@@ -70,6 +71,18 @@
 
         });
     })
+
+    //获取像素比
+    var getPixelRatio = function (context) {
+        var backingStore = context.backingStorePixelRatio ||
+            context.webkitBackingStorePixelRatio ||
+            context.mozBackingStorePixelRatio ||
+            context.msBackingStorePixelRatio ||
+            context.oBackingStorePixelRatio ||
+            context.backingStorePixelRatio || 1;
+        return (window.devicePixelRatio || 1) / backingStore;
+    };
+
 
 </script>
 </html>
